@@ -1,3 +1,16 @@
+---
+layout:     post
+title:      Pandorabox 扩大overlay容量
+subtitle:   用于解决路由器空间不足无法安装插件的问题
+date:       2021-04-04
+author:     hxlh50k
+header-img: null
+catalog: true
+tags:
+    - linux
+    - Pandorabox
+    - 路由器
+---
 本文参考了[PandoraBox扩大内部容量](https://zfuns.github.io/pdr/)，修正了原文的错误并作出了一些改进。
 
 0. 格式化U盘为ext3或ext4文件系统，这一步在windows下可使用diskgenius新版实现，官网下载免费版即可；
