@@ -1,16 +1,16 @@
 # Site settings
-title: My Blog
-SEOTitle: 我的博客 | My Blog
+title: 一个博客
+SEOTitle: 一个博客 | A Blog
 header-img: img/post-bg-desk.jpg
 email: 暂无
-description: "写一句你想写的话"
-keyword: "我的博客"
+description: "偷懒建设中..."
+keyword: "一个博客"
 url: "http://hxlh50k.github.io"          # your host, for absolute URL
 baseurl: ""      # for example, '/blog' if your blog hosted on 'host/blog'
 github_repo: "https://github.com/hxlh50k/hxlh50k.github.io.git" # you code repository
 
 # Sidebar settings
-sidebar: true                           # whether or not using Sidebar.
+sidebar: false                          # whether or not using Sidebar.
 sidebar-about-description: "苟利国家生死以，岂因祸福避趋之~"
 sidebar-avatar: /img/avatar_binggan.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
 
