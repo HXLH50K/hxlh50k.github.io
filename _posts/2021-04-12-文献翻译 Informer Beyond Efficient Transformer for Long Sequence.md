@@ -14,17 +14,6 @@ tags:
     - LSTM
     - 深度学习
 ---
-<head>
-    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
-    <script type="text/x-mathjax-config">
-        MathJax.Hub.Config({
-            tex2jax: {
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-            inlineMath: [['$','$']]
-            }
-        });
-    </script>
-</head>
 
 ## 说明
 
@@ -71,33 +60,45 @@ tags:
 ### 高效自注意力机制
 
 　　Vaswani提出的典型自注意力（Vaswani, A.; Shazeer, N.; Parmar, N.; Uszkoreit, J.; Jones, L.; Gomez, A. N.; Kaiser, Ł.; and Polosukhin, I. 2017. Attention is all you need. In NIPS, 5998–6008.）是基于元组输入，即query、key和value定义的，其执行的缩放点积（译者注：原文[scaled dot-product]，并不理解）表示为$\mathcal{A}(\pmb{Q},\pmb{K},\pmb{V}) = Softmax(\pmb{Q}\pmb{K}^\mathrm{T}/\sqrt{d})\pmb{V}, \pmb{Q}\in\mathbb{R}^{L_Q×d}, \pmb{K}\in\mathbb{R}^{L_K×d}, \pmb{V}\in\mathbb{R}^{L_V×d}, d为输入维度$为了进一步讨论自注意力机制，让$q_i, k_i, v_i分别代表\pmb{Q}, \pmb{K}, \pmb{V}$中的第$i$行。根据Tsai等人提出的公式（Tsai, Y .-H. H.; Bai, S.; Y amada, M.; Morency, L.-P .; and Salakhutdinov, R. 2019. Transformer Dissection: An Unified Understanding for Transformer’s Attention via the Lens of Kernel. In ACL 2019, 4335–4344.），第i个query的注意力被定义为一个概率形式的核平滑器:
+
  $$\mathcal{A}(\pmb{\rm q}_i, \pmb{K}, \pmb{V}) = \sum_j{\frac{k(\pmb{\rm q}_i,\pmb{\rm k}_j)}{\sum_lk(\pmb{\rm q}_i,\pmb{\rm k_i})}\pmb{\rm v}_j = \mathbb{E}_{p(\pmb{\rm k}_j|\pmb{\rm q}_i)}[\pmb{\rm v}_j]} \tag{1}$$
+
 其中$p(\pmb{\rm k}_i|\pmb{\rm q}_i) = k(\pmb{\rm q}_i, \pmb{\rm k}_j)/\sum_l{k(\pmb{\rm q}_i,\pmb{\rm k}_l)}$，且$k({\rm q}_i,{\rm k}_l)$选择了不对称的指数核$exp(\pmb{\rm q}_i\pmb{\rm k}^\mathrm{T}_j/\sqrt{d})$。自注意力通过计算概率$p(\pmb{\rm k}_j|\pmb{\rm q}_i)$将值进行组合并获得输出。它需要使用$O(L^2)$时间进行点积计算和$O(L_QL_K)$的内存使用，这是提高预测能力的主要缺点。  
 　　前人的一些尝试表明，自注意力概率的分布具有潜在的稀疏性，他们在不显著影响性能的情况下，对所有的$p(\pmb{\rm k}_j|\pmb{\rm q}_i)$都设计了“选择性”计数策略。稀疏Transformer合并了行输出和列输入，其中稀疏性是由这些分离的空间相关性引起的。对数稀疏Transformer注意到自注意力的循环模式，并迫使每个单元格以指数步长关注前一个单元格。Longformer将前两部作品扩展到更复杂的稀疏配置。但是，他们都局限于从启发式的方法进行理论分析，用相同的策略来解决每个多头自注意力问题，这就限制了他们的进一步提高。  
 　　为了激励我们的方法，我们首先对习得的规范自注意力的注意模式进行定性评估。“稀疏性”自注意力得分形成了一个长尾分布(详见附录C)，即少数点积对贡献了主要注意力，其他点积对贡献了次要注意力。那么下一个问题是如何区分它们呢？  
 　　**Query稀疏度度量** 根据公式(1)，第i个query对所有key的关注被定义为概率p(kj|qi)，并且输出是其与值v的合成。主要的点积对鼓励相应query的注意力概率分布远离均匀分布。如果$p(\pmb{\rm k}_j|\pmb{\rm q}_i)$接近均匀分布$q(\pmb{\rm k}_j|\pmb{\rm q}_i) = 1/L_k$，则自注意力成为对$\pmb{V}$的普通求和，并且这对住宅输入（译者注：原文[residential input]，可能是某种数据集？）是多余的。当然，分布$p$和$q$之间的“相似性”可以用来区分“重要的”query。我们通过Kullback-Leibler散度来衡量“相似性” $KL(q||p) = \ln{\sum^{L_K}_{l=1}{e^{\pmb{\rm q}_i\pmb{\rm k}_l^\mathrm{T}/\sqrt{d}}}}-\frac{1}{L_K}\sum^{L_K}_{j=1}\pmb{\rm q}_i\pmb{\rm k}_j^\mathrm{T}/\sqrt{d}-\ln{L_K}$ 。丢弃常量，我们将第i个query的稀疏度量定义为
+
 $$M(\pmb{\rm q}_i, \pmb{K}=\ln{\sum^{L_K}_{j=1}{e^{\frac{\pmb{\rm q}_i\pmb{\rm k}_j^\mathrm{T}}{\sqrt{d}}}}}-\frac{1}{L_K}\sum^{L_K}_{j=1}{\frac{\pmb{\rm q}_i\pmb{\rm k}_j^\mathrm{T}}{\sqrt{d}}})\tag{2}$$  
+
 其中，第一项是$\pmb{\rm q}_i$在所有key上的Log-Sum-Exp(LSE)（译者注：与softmax公式有关），第二项是它们的算术平均值。如果第i个query获得较大的$M(\pmb{\rm q}_i，\pmb{K})$，则其关注概率$p$更加“多样化”，并且很有可能在长尾自注意力分布的头部包含占主导地位的点积对。  
 　　**ProbSparse自注意力** 基于候选的测量，我们通过允许每个key只关注$u$个主要查询来实现ProbSparse自注意力：
+
 $$\mathcal{A}(\pmb{Q},\pmb{K},\pmb{V})=Softmax(\frac{\overline{\pmb{Q}}\pmb{K}^\mathrm{T}}{\sqrt{d}})\pmb{V}\tag{3}$$
+
 其中$\pmb{Q}$是和$\pmb{\rm q}$相同大小的稀疏矩阵，并且它仅包含稀疏度量$M(\pmb{\rm q}，\pmb{K})$下的$Top-u$个query。在固定采样因子c的控制下，设置$u=c·\ln{LQ}$，使得ProbSparse自注意力算法的每个query-key只需进行$O(\ln{LQ})$复杂度的点积计算，并且层内存使用量保持$O(L_K\ln{L_Q})$。在多头视角下，这种关注为每个头生成不同的稀疏query-key对，从而避免了严重的信息丢失。  
 　　然而，遍历测量$M(\pmb{\rm q}_i，\pmb{K})$的所有query需要计算每个点积对，即二次方时间复杂度$O(L_QL_K)$，此外LSE操作还存在潜在的数值稳定性问题。受此启发，我们提出了一种有效获取query稀疏性度量的经验近似方法。  
 　　**引理1.** 对于每个query$\pmb{\rm q}_i\in\mathbb{R}^d$和属于key集合$\pmb{K}$中的key$\pmb{\rm k}_j\in\mathbb{R}^d$，其有界，为：$\ln{L_K} \leq M(\pmb{\rm q}_i,\pmb{K}) \leq \max_j{\{\pmb{\rm q}_i\pmb{\rm k}_j^\mathrm{T}/\sqrt{d}\}}-\frac{1}{L_K}\sum^{L_K}_{j=1}{\{\pmb{\rm q}_i\pmb{\rm k}_j^\mathrm{T}/\sqrt{d}\}}+\ln{L_K}$。当$\pmb{\rm q}_i\in\pmb{K}$时，它也成立。  
 　　从引理1(证明见附录D.1)出发，我们提出最大均值测度为
+
 $$\overline{M}(\pmb{\rm q}_i,\pmb{K})=\max_j{\{\frac{\pmb{\rm q}_i\pmb{\rm k}_j^\mathrm{T}}{\sqrt{d}}\}-\frac{1}{L_K}\sum^{L_K}_{j=1}{\frac{\pmb{\rm q}_i\pmb{\rm k}_j^\mathrm{T}}{\sqrt{d}}}}\tag{4}$$  
+
 　　$Top-u$的范围大致适用于命题1的边界松弛(参见附录D.2)。在长尾分布下，我们只需要随机抽样$U = L_K\ln{L_Q}$的点积对就可以计算出$M(\pmb{\rm q}_i，\pmb{K})$，例如用零填充其他对。然后，我们从中选择稀疏的$Top-u$作为$\pmb{Q}$。$M(\pmb{\rm q}_i，\pmb{K})$中的$max$算子对零值不太敏感，数值稳定。实际上，在自注意力计算中，query和key的输入长度通常是相等的，即$L_Q= L_K= L$，因此稀疏自注意力的总时间复杂度和空间复杂度为$0(L\ln{L})$。  
 
 ### 编码器:允许在内存使用限制下处理较长的顺序输入
 
 　　编码器的设计目的是提取长序列输入的鲁棒长程相关性。在输入表示之后，第$t$个序列输入$X^t$已经被变形为矩阵$X^t_en\in\mathbb{R}^{L_x \times d_{model}}$。为了清楚起见，我们在图(3)中给出了编码器的草图。  
 　　**自我注意的提取** 作为*ProbSparse*自我注意机制的自然结果，编码器的特征图具有value$\pmb{V}$的冗余组合。我们使用提取操作将主要特征赋予高级特征，并在下一层生成聚焦的自我注意特征图。它大幅削减了输入的时间维度，看到了图(3)中关注块的n头权重矩阵(重叠的红色方块)。受膨胀卷积的启发，我们从第j层向前推进到第(j+1)层的“提取”如下：
+
 $$X^t_{j+1}=MaxPool(ELU(Conv1d([X^t_j]_{AB})))\tag{5}$$
+
 其中$[·]_{AB}$表示注意力模块，包括它包含了多头*ProbSparse*自我注意和基本操作，$Conv1d(·)$利用$ELU(·)$激活函数在时间维上执行1维卷积滤波器(核宽度=3)。在堆叠一个层后，我们增加了一个步长为2的最大池化层，并将$X^t$下采样到一半，从而将整个内存使用量减少到$O((2−\epsilon)L\log{L})$，$\epsilon$是一个很小的数字。为了增强提取操作的健壮性，我们用减半的输入构建主栈的副本，并通过一次丢弃一层来逐步减少自我关注提取层的数量，就像图(2)中的金字塔一样，从而使它们的输出维度对齐。因此，我们将所有堆栈的输出连接起来，得到编码器的最终特征图。
 
 ### 解码器：通过一次前向传播生成长顺序输出
 
 图(2)使用标准的解码器结构，它由两个相同的多头关注层堆叠而成。然而，在长期预测中，采用生成式推理来缓解速度骤降。我们向解码器提供以下向量：
+
 $$X^t_{de}=Concat(X^t_{token},X^t_0)\in\mathbb{R}^{(L_{token}+L_y) \times d_{model}}\tag{6}$$
+
 其中$X^t_{token}\in\mathbb{R}^{L_{token}\times d_{model}}$是开始令牌$X^t_0\in\mathbb{R}^{L_y\times d_{model}}$是目标序列的占位符(将标量设置为0)。通过将遮罩点积设置为$−\infty$，将遮罩多头注意力应用于ProbSparse自我注意计算。它防止每个位置关注即将到来的位置，从而避免自回归。一个全连接层获得最终输出，它的大小$d_y$取决于我们执行的是单变量预测还是多变量预测。  
 　　**生成式推理** 起始令牌被有效地应用于NLP的“动态解码”，我们将其扩展为一种生成式的方法。我们不选择特定的标志作为令牌，而是采样输入序列中的$L_{token}$长序列，例如输出序列之前的较早切片。以预测168个点为例(实验部分的7天温度预测)，我们将目标序列前5天的已知时间作为“开始令牌”，并以$X_{de}=\{X_{5d}，X_0\}$作为生成式推理解码器的输入。$X_0$包含目标序列的时间戳，即目标周的上下文。然后，我们提出的解码器通过一次前向传播预测输出，而不是传统编解码器体系结构中耗时的“动态解码”。在计算效率部分给出了详细的性能比较。  
 　　**Loss函数** 我们在预测目标序列时选择MSE损失函数，损失从解码器的输出传回整个模型。
