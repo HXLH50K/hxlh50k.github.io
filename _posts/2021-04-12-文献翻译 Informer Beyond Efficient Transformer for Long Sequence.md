@@ -1,7 +1,7 @@
 ---
 layout:     post
-title:      [文献翻译]Informer Beyond Efficient Transformer for Long Sequence
-subtitle:   arxiv: 2012.07436
+title:      文献翻译 Informer Beyond Efficient Transformer for Long Sequence
+subtitle:   arxiv 2012.07436
 date:       2021-04-13
 author:     hxlh50k
 header-img: null
