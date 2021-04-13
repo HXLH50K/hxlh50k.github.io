@@ -61,7 +61,9 @@ tags:
 
 　　Vaswani提出的典型自注意力（Vaswani, A.; Shazeer, N.; Parmar, N.; Uszkoreit, J.; Jones, L.; Gomez, A. N.; Kaiser, Ł.; and Polosukhin, I. 2017. Attention is all you need. In NIPS, 5998–6008.）是基于元组输入，即query、key和value定义的，其执行的缩放点积（译者注：原文[scaled dot-product]，并不理解）表示为$\mathcal{A}(\pmb{Q},\pmb{K},\pmb{V}) = Softmax(\pmb{Q}\pmb{K}^\mathrm{T}/\sqrt{d})\pmb{V}, \pmb{Q}\in\mathbb{R}^{L_Q×d}, \pmb{K}\in\mathbb{R}^{L_K×d}, \pmb{V}\in\mathbb{R}^{L_V×d}, d为输入维度$为了进一步讨论自注意力机制，让$q_i, k_i, v_i分别代表\pmb{Q}, \pmb{K}, \pmb{V}$中的第$i$行。根据Tsai等人提出的公式（Tsai, Y .-H. H.; Bai, S.; Y amada, M.; Morency, L.-P .; and Salakhutdinov, R. 2019. Transformer Dissection: An Unified Understanding for Transformer’s Attention via the Lens of Kernel. In ACL 2019, 4335–4344.），第i个query的注意力被定义为一个概率形式的核平滑器:
 
- $$\mathcal{A}(\pmb{\rm q}_i, \pmb{K}, \pmb{V}) = \sum_j{\frac{k(\pmb{\rm q}_i,\pmb{\rm k}_j)}{\sum_lk(\pmb{\rm q}_i,\pmb{\rm k_i})}\pmb{\rm v}_j = \mathbb{E}_{p(\pmb{\rm k}_j|\pmb{\rm q}_i)}[\pmb{\rm v}_j]} \tag{1}$$
+ $$
+ \mathcal{A}(\pmb{\rm q}_i, \pmb{K}, \pmb{V}) = \sum_j{\frac{k(\pmb{\rm q}_i,\pmb{\rm k}_j)}{\sum_lk(\pmb{\rm q}_i,\pmb{\rm k_i})}\pmb{\rm v}_j = \mathbb{E}_{p(\pmb{\rm k}_j|\pmb{\rm q}_i)}[\pmb{\rm v}_j]} \tag{1}
+ $$
 
 其中 $p(\pmb{\rm k}_i|\pmb{\rm q}_i) = k(\pmb{\rm q}_i, \pmb{\rm k}_j)/\sum_l{k(\pmb{\rm q}_i,\pmb{\rm k}_l)}$ ，且$k({\rm q}_i,{\rm k}_l)$选择了不对称的指数核$exp(\pmb{\rm q}_i\pmb{\rm k}^\mathrm{T}_j/\sqrt{d})$。自注意力通过计算概率$p(\pmb{\rm k}_j|\pmb{\rm q}_i)$将值进行组合并获得输出。它需要使用$O(L^2)$时间进行点积计算和$O(L_QL_K)$的内存使用，这是提高预测能力的主要缺点。  
 　　前人的一些尝试表明，自注意力概率的分布具有潜在的稀疏性，他们在不显著影响性能的情况下，对所有的$p(\pmb{\rm k}_j|\pmb{\rm q}_i)$都设计了“选择性”计数策略。稀疏Transformer合并了行输出和列输入，其中稀疏性是由这些分离的空间相关性引起的。对数稀疏Transformer注意到自注意力的循环模式，并迫使每个单元格以指数步长关注前一个单元格。Longformer将前两部作品扩展到更复杂的稀疏配置。但是，他们都局限于从启发式的方法进行理论分析，用相同的策略来解决每个多头自注意力问题，这就限制了他们的进一步提高。  
