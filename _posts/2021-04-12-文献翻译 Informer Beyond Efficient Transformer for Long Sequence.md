@@ -65,7 +65,7 @@ tags:
  \mathcal{A}(\pmb{\rm q}_i, \pmb{K}, \pmb{V}) = \sum_j{\frac{k(\pmb{\rm q}_i,\pmb{\rm k}_j)}{\sum_lk(\pmb{\rm q}_i,\pmb{\rm k_i})}\pmb{\rm v}_j = \mathbb{E}_{p(\pmb{\rm k}_j|\pmb{\rm q}_i)}[\pmb{\rm v}_j]} \tag{1}
  $$
 
-其中 $p(\pmb{\rm k}_i|\pmb{\rm q}_i) = k(\pmb{\rm q}_i, \pmb{\rm k}_j)/\sum_l{k(\pmb{\rm q}_i,\pmb{\rm k}_l)}$，且$k({\rm q}_i,{\rm k}_l)$选择了不对称的指数核$exp(\pmb{\rm q}_i\pmb{\rm k}^\mathrm{T}_j/\sqrt{d})$。自注意力通过计算概率$p(\pmb{\rm k}_j|\pmb{\rm q}_i)$将值进行组合并获得输出。它需要使用$O(L^2)$时间进行点积计算和$O(L_QL_K)$的内存使用，这是提高预测能力的主要缺点。  
+其中 $p(\pmb{\rm k}_i|\pmb{\rm q}_i) = k(\pmb{\rm q}_i, \pmb{\rm k}_j)/\sum_l{k(\pmb{\rm q}_i,\pmb{\rm k}_l)}$ ，且 $k({\rm q}_i,{\rm k}_l)$ 选择了不对称的指数核 $exp(\pmb{\rm q}_i\pmb{\rm k}^\mathrm{T}_j/\sqrt{d})$ 。自注意力通过计算概率 $p(\pmb{\rm k}_j|\pmb{\rm q}_i)$ 将值进行组合并获得输出。它需要使用 $O(L^2)$ 时间进行点积计算和 $O(L_QL_K)$ 的内存使用，这是提高预测能力的主要缺点。  
 　　前人的一些尝试表明，自注意力概率的分布具有潜在的稀疏性，他们在不显著影响性能的情况下，对所有的$p(\pmb{\rm k}_j|\pmb{\rm q}_i)$都设计了“选择性”计数策略。稀疏Transformer合并了行输出和列输入，其中稀疏性是由这些分离的空间相关性引起的。对数稀疏Transformer注意到自注意力的循环模式，并迫使每个单元格以指数步长关注前一个单元格。Longformer将前两部作品扩展到更复杂的稀疏配置。但是，他们都局限于从启发式的方法进行理论分析，用相同的策略来解决每个多头自注意力问题，这就限制了他们的进一步提高。  
 　　为了激励我们的方法，我们首先对习得的规范自注意力的注意模式进行定性评估。“稀疏性”自注意力得分形成了一个长尾分布(详见附录C)，即少数点积对贡献了主要注意力，其他点积对贡献了次要注意力。那么下一个问题是如何区分它们呢？  
 　　**Query稀疏度度量** 根据公式(1)，第i个query对所有key的关注被定义为概率p(kj|qi)，并且输出是其与值v的合成。主要的点积对鼓励相应query的注意力概率分布远离均匀分布。如果$p(\pmb{\rm k}_j|\pmb{\rm q}_i)$接近均匀分布$q(\pmb{\rm k}_j|\pmb{\rm q}_i) = 1/L_k$，则自注意力成为对$\pmb{V}$的普通求和，并且这对住宅输入（译者注：原文[residential input]，可能是某种数据集？）是多余的。当然，分布$p$和$q$之间的“相似性”可以用来区分“重要的”query。我们通过Kullback-Leibler散度来衡量“相似性” $KL(q||p) = \ln{\sum^{L_K}_{l=1}{e^{\pmb{\rm q}_i\pmb{\rm k}_l^\mathrm{T}/\sqrt{d}}}}-\frac{1}{L_K}\sum^{L_K}_{j=1}\pmb{\rm q}_i\pmb{\rm k}_j^\mathrm{T}/\sqrt{d}-\ln{L_K}$ 。丢弃常量，我们将第i个query的稀疏度量定义为
