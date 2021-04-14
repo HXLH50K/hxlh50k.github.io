@@ -31,7 +31,7 @@ tags:
 ## 1 介绍
 
 　　时间序列预测是许多领域的重要组成部分，例如传感器网络监控，能源和智能电网管理、经济、金融和疾病传播分析。在这些场景中，我们可以利用大量关于过去行为的时间序列数据来进行长期预测，即**长序列时间序列预测**(LSTF)。然而，现有的方法大多是在短期问题背景下设计的，比如预测48个点或更少。越来越长的序列限制了模型的预测能力，以至于这一趋势阻碍了对LSTF的研究。作为一个经验示例，图(1)显示了真实数据集上的预测结果，其中LSTM网络预测了从短期(12点，0.5天)到长期(480点，20天)的变电站的小时温度。当预测长度大于48个点(图(1b)中的实心星)时，整体性能差距很大，此时均方误差上升到不令人满意的性能，推理速度急剧下降，LSTM模型开始失败。  
-　　LSTF面临的主要挑战是提高预测能力，以满足日益增长的长序列需求，这需要 **(a)非凡的远程比对能力和(b)对长序列输入和输出的高效操作**。最近，Transformer模型 (译者注：[arxiv: 1706.03762]) 与RNN模型相比，在捕捉长程相关性方面表现出了更好的性能。自注意力机制可以将网络信号传播路径的最大长度减少到理论上的最短 $$O(1)$$ ，并避免递归结构，Transformer显示出解决LSTF问题的巨大潜力。然而，由于其$$O(L^2)$$的时间复杂度和$$O(L)$$的空间复杂度 (译者注：原文[L-quadratic computation and memory consumption on L-length inputs/outputs]) ，自注意力机制违反了要求(b)。一些大规模的Transformer模型倾注了大量资源，在NLP任务中取得了令人印象深刻的结果，但是在几十个GPU上的训练和昂贵的部署成本使得这些模型几乎不能用于现实世界的LSTF问题。自注意力机制和Transformer体系结构的效率成为它们应用于LSTF问题的瓶颈。因此，在这篇论文中，我们试图回答这个问题：*我们能否改进变压器模型以提高计算、存储和架构效率，同时保持更高的预测能力？*  
+　　LSTF面临的主要挑战是提高预测能力，以满足日益增长的长序列需求，这需要 **(a)非凡的远程比对能力和(b)对长序列输入和输出的高效操作**。最近，Transformer模型 (译者注：[arxiv: 1706.03762]) 与RNN模型相比，在捕捉长程相关性方面表现出了更好的性能。自注意力机制可以将网络信号传播路径的最大长度减少到理论上的最短 $$O(1)$$ ，并避免递归结构，Transformer显示出解决LSTF问题的巨大潜力。然而，由于其$$O(L^2)$$的时间复杂度和$$O(L)$$的空间复杂度 (译者注：原文[L-quadratic computation and memory consumption on L-length inputs/outputs]) ，自注意力机制违反了要求(b)。一些大规模的Transformer模型倾注了大量资源，在NLP任务中取得了令人印象深刻的结果，但是在几十个GPU上的训练和昂贵的部署成本使得这些模型几乎不能用于现实世界的LSTF问题。自注意力机制和Transformer体系结构的效率成为它们应用于LSTF问题的瓶颈。因此，在这篇论文中，我们试图回答这个问题：*我们能否改进Transformer模型以提高计算、存储和架构效率，同时保持更高的预测能力？*  
 　　一般的Transformer模型在解决LSTF问题时有三个重大限制：  
 
 1. **自注意力的二次方计算复杂度。** 自注意力机制的原子操作，即规范点积，导致每层的时间复杂性和存储器使用是$$O(L^2)$$。  
@@ -62,8 +62,8 @@ tags:
 　　Vaswani提出的典型自注意力（Vaswani, A.; Shazeer, N.; Parmar, N.; Uszkoreit, J.; Jones, L.; Gomez, A. N.; Kaiser, Ł.; and Polosukhin, I. 2017. Attention is all you need. In NIPS, 5998–6008.）是基于元组输入，即query、key和value定义的，其执行的缩放点积（译者注：原文[scaled dot-product]，并不理解）表示为$$\mathcal{A}(\pmb{Q},\pmb{K},\pmb{V}) = Softmax(\pmb{Q}\pmb{K}^\mathrm{T}/\sqrt{d})\pmb{V}, \pmb{Q}\in\mathbb{R}^{L_Q×d}, \pmb{K}\in\mathbb{R}^{L_K×d}, \pmb{V}\in\mathbb{R}^{L_V×d}, d为输入维度$$为了进一步讨论自注意力机制，让$$q_i, k_i, v_i分别代表\pmb{Q}, \pmb{K}, \pmb{V}$$中的第$$i$$行。根据Tsai等人提出的公式（Tsai, Y .-H. H.; Bai, S.; Y amada, M.; Morency, L.-P .; and Salakhutdinov, R. 2019. Transformer Dissection: An Unified Understanding for Transformer’s Attention via the Lens of Kernel. In ACL 2019, 4335–4344.），第i个query的注意力被定义为一个概率形式的核平滑器:
 
  $$
- \mathcal{A}(\pmb{\rm q}_i, \pmb{K}, \pmb{V}) = \sum_j{\frac{k(\pmb{\rm q}_i,\pmb{\rm k}_j)}{\sum_lk(\pmb{\rm q}_i,\pmb{\rm k_i})}\pmb{\rm v}_j = \mathbb{E}_{p(\pmb{\rm k}_j|\pmb{\rm q}_i)}[\pmb{\rm v}_j]}
- $$(1)
+ \mathcal{A}(\pmb{\rm q}_i, \pmb{K}, \pmb{V}) = \sum_j{\frac{k(\pmb{\rm q}_i,\pmb{\rm k}_j)}{\sum_lk(\pmb{\rm q}_i,\pmb{\rm k_i})}\pmb{\rm v}_j = \mathbb{E}_{p(\pmb{\rm k}_j|\pmb{\rm q}_i)}[\pmb{\rm v}_j]}\tag{1}
+ $$
   
 其中 $$p(\pmb{\rm k}_i|\pmb{\rm q}_i) = k(\pmb{\rm q}_i, \pmb{\rm k}_j)/\sum_l{k(\pmb{\rm q}_i,\pmb{\rm k}_l)}$$ ，且 $$k({\rm q}_i,{\rm k}_l)$$ 选择了不对称的指数核 $$exp(\pmb{\rm q}_i\pmb{\rm k}^\mathrm{T}_j/\sqrt{d})$$ 。自注意力通过计算概率 $$p(\pmb{\rm k}_j|\pmb{\rm q}_i)$$ 将值进行组合并获得输出。它需要使用 $$O(L^2)$$ 时间进行点积计算和 $$O(L_QL_K)$$ 的内存使用，这是提高预测能力的主要缺点。  
 　　前人的一些尝试表明，自注意力概率的分布具有潜在的稀疏性，他们在不显著影响性能的情况下，对所有的$$p(\pmb{\rm k}_j|\pmb{\rm q}_i)$$都设计了“选择性”计数策略。稀疏Transformer合并了行输出和列输入，其中稀疏性是由这些分离的空间相关性引起的。对数稀疏Transformer注意到自注意力的循环模式，并迫使每个单元格以指数步长关注前一个单元格。Longformer将前两部作品扩展到更复杂的稀疏配置。但是，他们都局限于从启发式的方法进行理论分析，用相同的策略来解决每个多头自注意力问题，这就限制了他们的进一步提高。  
