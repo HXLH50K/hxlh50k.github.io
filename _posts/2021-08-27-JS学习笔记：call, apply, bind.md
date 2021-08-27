@@ -9,6 +9,7 @@ catalog: true
 tags:
   - JavaScript
   - 前端
+  - 学习笔记
 ---
 
 MDN:
@@ -98,4 +99,12 @@ console.log(f1) //[Function: bound ]
 
 ```JavaScript
 console.log(a.getName.bind(b, 1, 2, 3)()) //"xiaohong123"
+```
+
+需要注意的是，bind()支持分批输入参数：
+
+```JavaScript
+console.log(a.getName.bind(b, 1, 2)(3)) //"xiaohong123"
+console.log(a.getName.bind(b, 1)(2, 3)) //"xiaohong123"
+console.log(a.getName.bind(b)(1, 2, 3)) //"xiaohong123"
 ```
