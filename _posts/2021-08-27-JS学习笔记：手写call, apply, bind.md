@@ -1,6 +1,6 @@
 ---
 layout: post
-title: JS学习笔记：call, apply, bind
+title: JS学习笔记：手写call, apply, bind
 subtitle: 这玩意真他妈难啊
 date: 2021-08-27
 author: hxlh50k
