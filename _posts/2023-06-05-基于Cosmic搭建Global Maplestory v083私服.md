@@ -28,7 +28,7 @@ OS Windows 10 Pro
 * Azure服务器费用偏贵，建议依据自身条件选择服务器供应商
 
 ## 2. 配置Windows防火墙规则
-对以下端口设置Inbound + Outbound规则，协议为TCP + UDP，共计添加4条规则
+对以下端口设置Inbound + Outbound规则，协议为TCP + UDP，共计添加4条规则  
 7575-7584（依据频道数量）,8484
 
 ## 3. 配置服务器防火墙规则
@@ -36,43 +36,43 @@ OS Windows 10 Pro
 
 ---
 # 服务器端
-服务器端依据该Repo搭建：https://github.com/P0nk/Cosmic  
+服务器端依据该Repo搭建：<https://github.com/P0nk/Cosmic>  
 
 1. 安装JDK17  
-https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html
+<https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html>
 
 1. 安装VC++ 2019  
-https://aka.ms/vs/17/release/vc_redist.x64.exe
+<https://aka.ms/vs/17/release/vc_redist.x64.exe>
 
 1. 安装Git  
-https://git-scm.com/
+<https://git-scm.com/>
 
 1. 安装IntelliJ IDEA  
-https://www.jetbrains.com/idea/  
+<https://www.jetbrains.com/idea/>  
 社区版即可，完成后重启
 
 1. 安装MySql  
-https://dev.mysql.com/downloads/windows/installer/8.0.html  
+<https://dev.mysql.com/downloads/windows/installer/8.0.html>  
 MySQL Community Server 8.0.33   
 安装完成进入配置界面，注意以下选项：  
 config type: server computer （本地玩家选择Developer computer）   
 设置root密码，记牢。
 
 1. 安装Sqlyog  
-https://github.com/webyog/sqlyog-community/wiki/Downloads
+<https://github.com/webyog/sqlyog-community/wiki/Downloads>
 
 
 1. Clone代码
     1. 打开IntelliJ，New project，全部默认，直到进入编辑器界面
     1. File - New - Project from Version Control...
-    1. Url填写 https://github.com/P0nk/Cosmic.git
+    1. Url填写 `https://github.com/P0nk/Cosmic.git`
     1. 设置代码保存位置 e.g. C:\Maplestory\
     1. 等到下方进度条跑完，窗口别关
 
 1. 初始化数据库
     1. 打开Sqlyog
     1. 右键左侧root@localhost - 执行SQL脚本
-    1. 找到C:\Maplestory\database\sql，依次执行4个脚本
+    1. 找到`C:\Maplestory\database\sql`，依次执行4个脚本
 
 1. 修改服务器配置
     1. 打开项目根目录下的config.yaml
