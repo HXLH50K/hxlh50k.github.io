@@ -104,4 +104,6 @@ theme: stun
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
-  type: ''
+  type: git
+  repo: https://github.com/hxlh50k/hxlh50k.github.io.git
+  branch: main
