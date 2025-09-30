@@ -106,4 +106,4 @@ theme: stun
 deploy:
   type: git
   repo: https://github.com/hxlh50k/hxlh50k.github.io.git
-  branch: deploy
+  branch: main
