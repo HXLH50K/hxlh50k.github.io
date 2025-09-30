@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/favicon/web-app-manifest-192x192.png?v=2.8.0" type="image/png" sizes="16x16"><link rel="icon" href="/favicon/web-app-manifest-512x512.png?v=2.8.0" type="image/png" sizes="32x32"><meta name="description" content="lab403用户教程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker快速入门">
+<meta property="og:url" content="https://hxlh50k.github.io/2021/08/05/Docker%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/index.html">
+<meta property="og:site_name" content="一个博客">
+<meta property="og:description" content="lab403用户教程">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-08-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-30T13:54:10.745Z">
+<meta property="article:author" content="hxlh50k">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="Lab403">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary"><title>Docker快速入门 | 一个博客</title><link ref="canonical" href="https://hxlh50k.github.io/2021/08/05/Docker%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.8.0"><link rel="stylesheet" href="css/custom.css"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":false},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 8.0.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">一个博客</div><div class="header-banner-info__subtitle">逸一时，误一世</div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">Docker快速入门</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2021-08-05</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2025-09-30</span></span></div></header><div class="post-body"><ol>
+<li>一些概念的粗暴解释：  <blockquote>
+<ul>
+<li>docker：一个软件，可以让你玩下面这些操作</li>
+<li>镜像：安装系统的镜像文件，类比成windows的.iso</li>
+<li>容器：配置好的虚拟机<br>以上的解释并不完全准确，仅是为了便于新手入门。</li>
+</ul>
+</blockquote>
+</li>
+<li>使用<code>docker image ls</code>查看可用镜像</li>
+</ol>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ docker image <span class="built_in">ls</span></span><br><span class="line">REPOSITORY   TAG       IMAGE ID       CREATED      SIZE</span><br><span class="line">lab403       2.0       cfdccfbadc91   5 days ago   17.2GB</span><br><span class="line">newyuxinyu   0.1       8baf8b1c1d6c   5 days ago   16GB</span><br></pre></td></tr></table></div></figure>
+<ol start="3">
+<li>没有特殊需求的话，选择<code>lab403:2.0</code>作为容器的基本镜像</li>
+</ol>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run --name test1 --gpus all -p 1088:80 -v /home/chenhongyang:/home --ipc=host -itd lab403:2.0</span><br></pre></td></tr></table></div></figure>
+<p>下面依次解释每个参数的含义：  </p>
+<ul>
+<li>–name 设置容器的名称。按心情来即可，但必须保证含有自己的实名，使其他服务器使用者能分辨容器的归属；</li>
+<li>–gpus 设置容器所能使用的gpu。不要动 ；</li>
+<li>-p 设置容器内外端口映射。可以不设置，但是设置了必须保证和其他所有人的都不样，否则两个容器不能同时启动。65535以下的数字随便输入；</li>
+<li>-v <strong>重点注意</strong>，设置容器内外的目录挂载， : 左边为宿主机的目录，右边为容器内的目录。设置完成后，在宿主机的<code>/home/chenhongyang/</code>下<code>touch 111.txt</code>,则容器内的<code>/home/</code>下也会对应出现<code>111.txt</code>，反过来一样。<br>　　该项若不设置，容器内的所有文件均会存储在<code>/</code>分区下，且难以在宿主机上找到，纯属给大伙和自己找麻烦，所以每个人必须设置挂载目录。容器内的映射路径可以随便设置，只要你能记得住理得清。分不清的把  :  两边设置成一样的。<br>　　如果需要一次挂载多个目录，输入多个-v参数：</li>
+</ul>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run --name test1 --gpus all -p 1088:80 -v /home/chenhongyang:/home/chenhongyang -v /mnt/xiaohuang:/home/chenhongyang/xiaohuang --ipc=host -itd lab403:2.0</span><br></pre></td></tr></table></div></figure>
+<ul>
+<li>-itd 不用管，输入就完事了。对详细信息感兴趣的请查阅官方文档；</li>
+<li>lab403:2.0 使用的镜像。  :  左边是镜像名，右边是tag，不输入tag默认为latest</li>
+</ul>
+<ol start="4">
+<li>run完成后，启动容器</li>
+</ol>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker start test1</span><br></pre></td></tr></table></div></figure>
+<p>第一次run完是start过的，服务器每次重启后需要再次start，理解为对虚拟机开机。<br>5. 查看容器状态</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ docker ps -a</span><br><span class="line">CONTAINER ID   IMAGE            COMMAND                  CREATED          STATUS                  PORTS                                                       NAMES</span><br><span class="line">60aab14f7bc5   lab403:2.0       <span class="string">&quot;/usr/local/bin/nvid…&quot;</span>   28 seconds ago   Up 26 seconds           6006/tcp, 8888/tcp, 0.0.0.0:1088-&gt;80/tcp, :::1088-&gt;80/tcp   test1  </span><br><span class="line">413b2288f4a1   newyuxinyu:0.1   <span class="string">&quot;/usr/local/bin/nvid…&quot;</span>   3 days ago       Up 3 days               6006/tcp, 8888/tcp, 0.0.0.0:5050-&gt;80/tcp, :::5050-&gt;80/tcp   newyuxinyu  </span><br><span class="line">3542b58388aa   lab403:2.0       <span class="string">&quot;/usr/local/bin/nvid…&quot;</span>   5 days ago       Exited (0) 5 days ago                                                               xuchenyang</span><br></pre></td></tr></table></div></figure>
+<p>可以看到刚才新建的容器已经出现了。<br>6. 容器启动情况下，执行</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker <span class="built_in">exec</span> -it test1 /bin/bash</span><br></pre></td></tr></table></div></figure>
+<p>其中test1是你的容器名，其他内容不要理解，死记就完事。<br>7. 退出容器</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">exit</span></span><br></pre></td></tr></table></div></figure>
+<p>.<br>8. 注意你的状态<br>当你的命令行最前面显示<code>chenhongyang@dell-2</code>时，表示你现在位于宿主机上，当显示<code>root@60aab14f7bc5</code>时，表示你位于容器内。<br>9. 其它事项  </p>
+<ul>
+<li>每次使用服务器需要执行6，如果发生过重启需要执行4；</li>
+<li>所有用户都位于docker组内，即表示你可以操作其他人的docker容器或镜像，请严格控制你的行为，未经允许不要操作别人的容器；</li>
+<li>如果需要配置适合自己的镜像，请参考另一篇还没有写的教程。</li>
+</ul>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://hxlh50k.github.io">hxlh50k</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://hxlh50k.github.io/2021/08/05/Docker%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/">https://hxlh50k.github.io/2021/08/05/Docker%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://hxlh50k.github.io/tags/Linux/">Linux</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://hxlh50k.github.io/tags/Lab403/">Lab403</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://hxlh50k.github.io/tags/Docker/">Docker</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2021/08/25/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E7%82%B9/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">深度学习基础知识点</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2021/05/16/Word%E4%B8%BA%E5%85%AC%E5%BC%8F%E6%8F%92%E5%85%A5%E5%9F%9F%E7%BC%96%E5%8F%B7%E5%8F%8A%E4%BA%A4%E5%8F%89%E5%BC%95%E7%94%A8/"><span class="paginator-prev__text">Word为公式插入域编号及交叉引用</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/avatar/avatar-512x512.png" alt="avatar"></div><p class="sidebar-ov-author__text">hxlh50k</p></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">14</div><div class="sidebar-ov-state-item__name">归档</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span><span class="sidebar-reading-info__perc">%</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2025</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>hxlh50k</span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v8.0.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.8.0</span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="/js/utils.js?v=2.8.0"></script><script src="/js/stun-boot.js?v=2.8.0"></script><script src="/js/scroll.js?v=2.8.0"></script><script src="/js/header.js?v=2.8.0"></script><script src="/js/sidebar.js?v=2.8.0"></script></body></html>
