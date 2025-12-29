@@ -1,0 +1,130 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/favicon/web-app-manifest-192x192.png?v=2.8.0" type="image/png" sizes="16x16"><link rel="icon" href="/favicon/web-app-manifest-512x512.png?v=2.8.0" type="image/png" sizes="32x32"><meta name="description" content="A guide on using acme.sh and the DNS API to configure and auto-renew a single wildcard SSL certificate for multiple servers.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Configure a Single Public Certificate for Multiple Servers">
+<meta property="og:url" content="https://hxlh50k.github.io/2025/12/29/Configure-Public-Certificate-for-Multiple-Servers/index.html">
+<meta property="og:site_name" content="一个博客">
+<meta property="og:description" content="A guide on using acme.sh and the DNS API to configure and auto-renew a single wildcard SSL certificate for multiple servers.">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-12-28T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-12-29T03:37:42.776Z">
+<meta property="article:author" content="hxlh50k">
+<meta property="article:tag" content="Azure">
+<meta property="article:tag" content="Certificate">
+<meta property="article:tag" content="Hysteria2">
+<meta property="article:tag" content="Proxy">
+<meta property="article:tag" content="SSL">
+<meta property="article:tag" content="Tools">
+<meta property="article:tag" content="Ubuntu">
+<meta property="article:tag" content="acme.sh">
+<meta name="twitter:card" content="summary"><title>Configure a Single Public Certificate for Multiple Servers | 一个博客</title><link ref="canonical" href="https://hxlh50k.github.io/2025/12/29/Configure-Public-Certificate-for-Multiple-Servers/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.8.0"><link rel="stylesheet" href="css/custom.css"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":false},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 8.0.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">一个博客</div><div class="header-banner-info__subtitle">逸一时，误一世</div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">Configure a Single Public Certificate for Multiple Servers</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2025-12-29</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2025-12-29</span></span></div></header><div class="post-body"><p>This article documents the process of using <code>acme.sh</code> and a DNS API to issue and renew a wildcard SSL certificate for the same domain across multiple servers.</p>
+
+        <h2 id="Prerequisites"   >
+          <a href="#Prerequisites" class="heading-link"><i class="fas fa-link"></i></a><a href="#Prerequisites" class="headerlink" title="Prerequisites"></a>Prerequisites</h2>
+      <ul>
+<li>A domain name, e.g., <code>abc.org</code></li>
+<li>One or more servers</li>
+<li>Each server will eventually have its own subdomain, e.g., <code>us1.abc.org</code>, <code>jp2.abc.org</code></li>
+</ul>
+
+        <h2 id="1-Obtain-DNS-Provider-API-Credentials"   >
+          <a href="#1-Obtain-DNS-Provider-API-Credentials" class="heading-link"><i class="fas fa-link"></i></a><a href="#1-Obtain-DNS-Provider-API-Credentials" class="headerlink" title="1. Obtain DNS Provider API Credentials"></a>1. Obtain DNS Provider API Credentials</h2>
+      <p>This step varies depending on the DNS provider. This article uses Microsoft Azure as an example.</p>
+<ol>
+<li>Log in to Azure Cloud Shell.</li>
+<li>Get your Subscription ID:<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">az account show</span><br></pre></td></tr></table></div></figure></li>
+<li>Create a Service Principal and obtain its credentials. Replace <code>&lt;SubscriptionID&gt;</code> with the ID obtained in the previous step.<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">az ad sp create-for-rbac --name <span class="string">&quot;AcmeDNSUpdater&quot;</span> --role <span class="string">&quot;DNS Zone Contributor&quot;</span> --scopes /subscriptions/&lt;SubscriptionID&gt;</span><br></pre></td></tr></table></div></figure></li>
+<li>You will receive a JSON output similar to the following. Keep the <code>appId</code>, <code>password</code>, and <code>tenant</code> values safe.<figure class="highlight json"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;appId&quot;</span><span class="punctuation">:</span> <span class="string">&quot;xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;displayName&quot;</span><span class="punctuation">:</span> <span class="string">&quot;AcmeDNSUpdater&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;password&quot;</span><span class="punctuation">:</span> <span class="string">&quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;tenant&quot;</span><span class="punctuation">:</span> <span class="string">&quot;xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></div></figure></li>
+</ol>
+
+        <h2 id="2-Issue-the-Certificate-on-the-Server"   >
+          <a href="#2-Issue-the-Certificate-on-the-Server" class="heading-link"><i class="fas fa-link"></i></a><a href="#2-Issue-the-Certificate-on-the-Server" class="headerlink" title="2. Issue the Certificate on the Server"></a>2. Issue the Certificate on the Server</h2>
+      <p>Execute the following steps on <strong>each</strong> server where the certificate needs to be configured.</p>
+<ol>
+<li>Switch to the <code>root</code> user. Using <code>sudo</code> may cause permission issues during subsequent certificate renewals.</li>
+<li>Set the credentials obtained in the previous step as environment variables.<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> AZUREDNS_SUBSCRIPTIONID=<span class="string">&quot;xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&quot;</span></span><br><span class="line"><span class="built_in">export</span> AZUREDNS_TENANTID=<span class="string">&quot;xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&quot;</span></span><br><span class="line"><span class="built_in">export</span> AZUREDNS_APPID=<span class="string">&quot;xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&quot;</span></span><br><span class="line"><span class="built_in">export</span> AZUREDNS_CLIENTSECRET=<span class="string">&quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;</span></span><br></pre></td></tr></table></div></figure>
+<blockquote>
+<p><strong>Note</strong>: After the first successful use of the DNS API, <code>acme.sh</code> will save the credentials encrypted in <code>~/.acme.sh/account.conf</code>. Therefore, these environment variables are only needed for the initial certificate issuance; subsequent renewal jobs will automatically load the saved credentials.</p>
+</blockquote>
+</li>
+<li>Install <code>acme.sh</code>.<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl https://get.acme.sh | sh</span><br><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></div></figure>
+<blockquote>
+<p>The installation script adds the <code>acme.sh</code> path to your <code>.bashrc</code> file. Running <code>source ~/.bashrc</code> makes it effective immediately in the current terminal. To ensure the command is available in all new terminals, it is recommended to log in again or open a new terminal window.</p>
+</blockquote>
+</li>
+<li>Set the default CA to Let’s Encrypt.<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">acme.sh --set-default-ca --server letsencrypt</span><br></pre></td></tr></table></div></figure></li>
+<li>Issue a wildcard certificate using the DNS challenge method. Replace <code>abc.org</code> with your own domain.<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">acme.sh --issue --dns dns_azure -d <span class="string">&#x27;*.abc.org&#x27;</span> -d <span class="string">&#x27;abc.org&#x27;</span></span><br></pre></td></tr></table></div></figure>
+Upon success, you will see output similar to this:<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[Sun Dec 28 14: 33: 38 UTC 2025] Your cert is in: /home/user/.acme.sh/*.abc.org_ecc/*.abc.org.cer</span><br><span class="line">[Sun Dec 28 14:33:38 UTC 2025] Your cert key is in: /home/user/.acme.sh/*.abc.org_ecc/*.abc.org.key</span><br><span class="line">[Sun Dec 28 14:33:38 UTC 2025] The intermediate CA cert is in: /home/user/.acme.sh/*.abc.org_ecc/ca.cer</span><br><span class="line">[Sun Dec 28 14:33:38 UTC 2025] And the full-chain cert is in: /home/user/.acme.sh/*.abc.org_ecc/fullchain.cer</span><br></pre></td></tr></table></div></figure></li>
+</ol>
+
+        <h2 id="3-Configure-Service-and-DNS"   >
+          <a href="#3-Configure-Service-and-DNS" class="heading-link"><i class="fas fa-link"></i></a><a href="#3-Configure-Service-and-DNS" class="headerlink" title="3. Configure Service and DNS"></a>3. Configure Service and DNS</h2>
+      <p>Using Hysteria2 as an example.</p>
+<ol>
+<li><p><strong>Install the Certificate</strong><br>Create a directory and install the certificate obtained from <code>acme.sh</code> to the specified location. The <code>--reloadcmd</code> will restart the corresponding service after the certificate is automatically renewed.</p>
+<figure class="highlight bash"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> -p /etc/hysteria/</span><br><span class="line">acme.sh --install-cert -d <span class="string">&#x27;*.abc.org&#x27;</span> \</span><br><span class="line">    --key-file       /etc/hysteria/private.key  \</span><br><span class="line">    --fullchain-file /etc/hysteria/cert.crt \</span><br><span class="line">    --reloadcmd     <span class="string">&quot;systemctl restart hysteria2&quot;</span></span><br></pre></td></tr></table></div></figure>
+<p>*The systemd service name <code>hysteria2</code> in <code>systemctl restart hysteria2</code> was configured in the previous article and depends on your local setup.</p>
+</li>
+<li><p><strong>Configure the Service</strong><br>Modify the service configuration file (e.g., Hysteria2’s <code>config.yaml</code>) to point the certificate paths to <code>/etc/hysteria/cert.crt</code> and <code>/etc/hysteria/private.key</code>, then restart the service.</p>
+</li>
+<li><p><strong>Configure DNS Records</strong><br>In your domain provider’s DNS settings page, add an <code>A</code> record for the server’s IP, pointing to the subdomain assigned to this server.</p>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="left">Type</th>
+<th align="left">Name (Subdomain)</th>
+<th align="left">Content (Server IP)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">A</td>
+<td align="left"><code>us1</code></td>
+<td align="left"><code>123.123.123.123</code></td>
+</tr>
+</tbody></table></div>
+</li>
+</ol>
+
+        <h2 id="4-Client-Connection"   >
+          <a href="#4-Client-Connection" class="heading-link"><i class="fas fa-link"></i></a><a href="#4-Client-Connection" class="headerlink" title="4. Client Connection"></a>4. Client Connection</h2>
+      <p>After completing the steps above, modify the client configuration:</p>
+<ul>
+<li><strong>Server Address</strong>: <code>us1.abc.org</code> (or the subdomain you set)</li>
+<li><strong>SNI&#x2F;Server Name</strong>: <code>us1.abc.org</code> (usually the same as the server address, clients will auto-fill this)</li>
+<li><strong>Allow Insecure</strong>: <code>false</code></li>
+</ul>
+<p>The client should now be able to connect successfully.</p>
+
+        <h2 id="Summary"   >
+          <a href="#Summary" class="heading-link"><i class="fas fa-link"></i></a><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2>
+      <p>For each new server, simply repeat the steps in “<a href="#2-%E5%9C%A8%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E7%94%B3%E8%AF%B7%E8%AF%81%E4%B9%A6">2. Issue the Certificate on the Server</a>“ and “<a href="#3-%E9%85%8D%E7%BD%AE%E6%9C%8D%E5%8A%A1%E4%B8%8E-dns">3. Configure Service and DNS</a>“. <code>acme.sh</code> will automatically handle the certificate renewals.</p>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://hxlh50k.github.io">hxlh50k</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://hxlh50k.github.io/2025/12/29/Configure-Public-Certificate-for-Multiple-Servers/">https://hxlh50k.github.io/2025/12/29/Configure-Public-Certificate-for-Multiple-Servers/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://hxlh50k.github.io/tags/Proxy/">Proxy</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://hxlh50k.github.io/tags/Tools/">Tools</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://hxlh50k.github.io/tags/Hysteria2/">Hysteria2</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://hxlh50k.github.io/tags/Ubuntu/">Ubuntu</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://hxlh50k.github.io/tags/acme-sh/">acme.sh</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://hxlh50k.github.io/tags/SSL/">SSL</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://hxlh50k.github.io/tags/Azure/">Azure</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://hxlh50k.github.io/tags/Certificate/">Certificate</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2025/12/29/%E5%A4%9A%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE%E5%90%8C%E4%B8%80%E5%85%AC%E5%85%B1%E8%AF%81%E4%B9%A6/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">多服务器配置同一公共证书</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2025/12/28/%E5%9C%A8Ubuntu%E4%B8%8A%E6%90%AD%E5%BB%BA%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6Hysteria2%E4%BB%A3%E7%90%86/"><span class="paginator-prev__text">在Ubuntu上搭建自签名证书Hysteria2代理</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Prerequisites"><span class="toc-number">1.</span> <span class="toc-text">
+          Prerequisites</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Obtain-DNS-Provider-API-Credentials"><span class="toc-number">2.</span> <span class="toc-text">
+          1. Obtain DNS Provider API Credentials</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Issue-the-Certificate-on-the-Server"><span class="toc-number">3.</span> <span class="toc-text">
+          2. Issue the Certificate on the Server</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Configure-Service-and-DNS"><span class="toc-number">4.</span> <span class="toc-text">
+          3. Configure Service and DNS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Client-Connection"><span class="toc-number">5.</span> <span class="toc-text">
+          4. Client Connection</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Summary"><span class="toc-number">6.</span> <span class="toc-text">
+          Summary</span></a></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/avatar/avatar-512x512.png" alt="avatar"></div><p class="sidebar-ov-author__text">hxlh50k</p></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">19</div><div class="sidebar-ov-state-item__name">归档</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span><span class="sidebar-reading-info__perc">%</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2025</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>hxlh50k</span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v8.0.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.8.0</span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="/js/utils.js?v=2.8.0"></script><script src="/js/stun-boot.js?v=2.8.0"></script><script src="/js/scroll.js?v=2.8.0"></script><script src="/js/header.js?v=2.8.0"></script><script src="/js/sidebar.js?v=2.8.0"></script></body></html>
