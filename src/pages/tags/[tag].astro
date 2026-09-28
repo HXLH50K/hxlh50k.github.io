@@ -1,0 +1,32 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArchiveList from '../../components/ArchiveList.astro';
+import { getPosts, getTags, tagUrl, type Post } from '../../lib/posts';
+
+export const getStaticPaths = (async () => {
+  const tags = getTags(await getPosts());
+  return tags.map((tag) => ({
+    params: { tag: tag.slug },
+    props: { name: tag.name, posts: tag.posts },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  name: string;
+  posts: Post[];
+}
+
+const { name, posts } = Astro.props;
+---
+
+<BaseLayout title={`标签：${name}`} description={`关于 ${name} 的 ${posts.length} 篇文章。`} canonicalPath={tagUrl(name)}>
+  <div class="collection-page">
+    <header class="page-heading">
+      <a class="text-link" href="/tags/">← 全部标签</a>
+      <h1><span class="tag-hash" aria-hidden="true">#</span> {name}</h1>
+      <p>这个话题下，共 {posts.length} 篇文章。</p>
+    </header>
+    <ArchiveList posts={posts} />
+  </div>
+</BaseLayout>

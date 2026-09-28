@@ -1,0 +1,41 @@
+---
+import { dateParts, formatDate, postUrl, type Post } from '../lib/posts';
+
+interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+const groups = new Map<string, Post[]>();
+for (const post of posts) {
+  const { year } = dateParts(post.data.date);
+  const group = groups.get(year);
+  if (group) group.push(post);
+  else groups.set(year, [post]);
+}
+---
+
+{posts.length === 0 && <p class="empty-state">这里还没有文章。</p>}
+<div class="archive-list">
+  {Array.from(groups, ([year, entries]) => (
+    <section class="archive-year" aria-labelledby={`year-${year}`}>
+      <h2 id={`year-${year}`}>
+        <a href={`/archives/${year}/`}>{year}</a>
+        <span>{entries.length} 篇</span>
+      </h2>
+      <ol role="list">
+        {entries.map((post) => {
+          const { month, day } = dateParts(post.data.date);
+          return (
+            <li class="archive-entry">
+              <a class="archive-date" href={`/archives/${year}/${month}/`} aria-label={`浏览 ${year} 年 ${Number(month)} 月归档`}>
+                <time datetime={post.data.date.toISOString()} title={formatDate(post.data.date)}>{month}-{day}</time>
+              </a>
+              <a class="archive-title" href={postUrl(post)}>{post.data.title}</a>
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+  ))}
+</div>

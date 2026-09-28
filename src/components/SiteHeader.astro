@@ -1,0 +1,25 @@
+---
+import { site } from '../site';
+
+const pathname = Astro.url.pathname;
+const links = [
+  { href: '/', label: '首页', active: pathname === '/' || pathname.startsWith('/page/') },
+  { href: '/archives/', label: '归档', active: pathname.startsWith('/archives/') },
+  { href: '/tags/', label: '标签', active: pathname.startsWith('/tags/') },
+];
+---
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/" aria-label={`${site.title}，返回首页`}>
+      <img src={site.avatar} alt="" width="38" height="38" />
+      <span>{site.title}</span>
+    </a>
+    <nav class="main-nav" aria-label="主导航">
+      {links.map(({ href, label, active }) => (
+        <a href={href} aria-current={active ? 'page' : undefined}>{label}</a>
+      ))}
+      <a href="/rss.xml" aria-label="订阅 RSS">RSS</a>
+    </nav>
+  </div>
+</header>

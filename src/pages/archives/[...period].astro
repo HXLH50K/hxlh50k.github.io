@@ -1,0 +1,91 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArchiveList from '../../components/ArchiveList.astro';
+import Pagination from '../../components/Pagination.astro';
+import { dateParts, getPosts, type Post } from '../../lib/posts';
+import { site } from '../../site';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  const periods = new Set<string>();
+  for (const post of posts) {
+    const { year, month } = dateParts(post.data.date);
+    periods.add(year);
+    periods.add(`${year}/${month}`);
+  }
+  return ['', ...periods].flatMap((period) => {
+    const periodPosts = period
+      ? posts.filter((post) => {
+          const { year, month } = dateParts(post.data.date);
+          return period === year || period === `${year}/${month}`;
+        })
+      : posts;
+    const totalPages = Math.max(1, Math.ceil(periodPosts.length / site.pageSize));
+    return Array.from({ length: totalPages }, (_, index) => {
+      const currentPage = index + 1;
+      const route = currentPage === 1
+        ? period
+        : `${period ? `${period}/` : ''}page/${currentPage}`;
+      return {
+        params: { period: route || undefined },
+        props: { posts: periodPosts, period, currentPage },
+      };
+    });
+  });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  posts: Post[];
+  period: string;
+  currentPage: number;
+}
+
+const { posts, period, currentPage } = Astro.props;
+const [year, month] = period.split('/');
+const totalPages = Math.max(1, Math.ceil(posts.length / site.pageSize));
+const visiblePosts = posts.slice((currentPage - 1) * site.pageSize, currentPage * site.pageSize);
+const basePath = period ? `/archives/${period}/` : '/archives/';
+const pageUrl = (page: number) => page === 1 ? basePath : `${basePath}page/${page}/`;
+const title = year ? `${year} 年${month ? ` ${Number(month)} 月` : ''}归档` : '文章归档';
+const pageTitle = currentPage > 1 ? `${title} · 第 ${currentPage} 页` : title;
+const months = Array.from(new Set(posts.map((post) => {
+  const parts = dateParts(post.data.date);
+  return `${parts.year}/${parts.month}`;
+})));
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={`${pageTitle}，共 ${posts.length} 篇文章。按时间回看学习与实践的记录。`}
+  canonicalPath={pageUrl(currentPage)}
+>
+  <Fragment slot="head">
+    {currentPage > 1 && <link rel="prev" href={new URL(pageUrl(currentPage - 1), site.url).href} />}
+    {currentPage < totalPages && <link rel="next" href={new URL(pageUrl(currentPage + 1), site.url).href} />}
+  </Fragment>
+  <div class="collection-page">
+    <header class="page-heading">
+      <p class="eyebrow">按时间回看</p>
+      <h1>{title}<span class="title-dot">.</span></h1>
+      <p>共 {posts.length} 篇文章，每一次记录都是一点积累。{totalPages > 1 && `第 ${currentPage} / ${totalPages} 页。`}</p>
+      {year && (
+        <nav class="breadcrumbs" aria-label="归档导航">
+          <a href="/archives/">全部归档</a>
+          {month && <><span aria-hidden="true">/</span><a href={`/archives/${year}/`}>{year} 年</a></>}
+        </nav>
+      )}
+    </header>
+    {!month && months.length > 0 && (
+      <nav class="archive-months" aria-label="按月浏览">
+        <ul class="tag-list" role="list">
+          {months.map((value) => (
+            <li><a class="tag" href={`/archives/${value}/`}>{value.replace('/', ' / ')}</a></li>
+          ))}
+        </ul>
+      </nav>
+    )}
+    <ArchiveList posts={visiblePosts} />
+    <Pagination currentPage={currentPage} totalPages={totalPages} basePath={basePath} />
+  </div>
+</BaseLayout>

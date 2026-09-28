@@ -1,0 +1,95 @@
+---
+import type { MarkdownHeading } from 'astro';
+import BaseLayout from './BaseLayout.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import { formatDate, dateParts, postUrl, tagUrl, type Post } from '../lib/posts';
+import { site } from '../site';
+import 'katex/dist/katex.min.css';
+import '../styles/article.css';
+
+interface Props {
+  post: Post;
+  headings: MarkdownHeading[];
+  newerPost?: Post;
+  olderPost?: Post;
+}
+
+const { post, headings, newerPost, olderPost } = Astro.props;
+const { title, description, date, updated, tags, catalog } = post.data;
+const author = post.data.author || site.author;
+const canonicalPath = postUrl(post);
+const canonical = new URL(canonicalPath, site.url).href;
+const { year, month } = dateParts(date);
+const hasToc = catalog && headings.length > 0;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalPath={canonicalPath}
+  type="article"
+  publishedTime={date}
+  modifiedTime={updated}
+  author={author}
+>
+  <article class="article-page">
+    <header class="article-header">
+      <nav class="breadcrumbs" aria-label="面包屑导航">
+        <a href="/">首页</a><span aria-hidden="true">/</span>
+        <a href="/archives/">文章</a><span aria-hidden="true">/</span>
+        <a href={`/archives/${year}/${month}/`}>{year} 年 {Number(month)} 月</a>
+      </nav>
+      <h1>{title}</h1>
+      <div class="article-meta">
+        {post.data.draft && <strong>草稿 · 仅开发预览</strong>}
+        <span>{author}</span>
+        <span>发布于 <time datetime={date.toISOString()}>{formatDate(date)}</time></span>
+        {updated && formatDate(updated) !== formatDate(date) && (
+          <span>更新于 <time datetime={updated.toISOString()}>{formatDate(updated)}</time></span>
+        )}
+      </div>
+      {tags.length > 0 && (
+        <ul class="tag-list" aria-label="文章标签" role="list">
+          {tags.map((tag) => <li><a class="tag" href={tagUrl(tag)}><span aria-hidden="true">#</span> {tag}</a></li>)}
+        </ul>
+      )}
+    </header>
+    <div class:list={['article-grid', { 'with-toc': hasToc }]}>
+      {hasToc && (
+        <aside class="article-sidebar">
+          <TableOfContents headings={headings} />
+        </aside>
+      )}
+      <div class="article-content">
+        <div class="prose"><slot /></div>
+        <footer class="article-footer">
+          <section class="attribution" aria-labelledby="attribution-title">
+            <h2 id="attribution-title">版权声明</h2>
+            <dl>
+              <div><dt>本文作者</dt><dd>{author}</dd></div>
+              <div><dt>本文链接</dt><dd><a href={canonical}>{canonical}</a></dd></div>
+            </dl>
+            <p>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" rel="license">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</p>
+          </section>
+          {(newerPost || olderPost) && (
+            <nav class="post-neighbors" aria-label="相邻文章">
+              {newerPost && (
+                <a href={postUrl(newerPost)} rel="prev" class="neighbor-newer">
+                  <span>← 上一篇 · 较新</span>
+                  <strong>{newerPost.data.title}</strong>
+                </a>
+              )}
+              {olderPost && (
+                <a href={postUrl(olderPost)} rel="next" class="neighbor-older">
+                  <span>下一篇 · 较早 →</span>
+                  <strong>{olderPost.data.title}</strong>
+                </a>
+              )}
+            </nav>
+          )}
+          <a class="back-to-top" href="#main-content">回到顶部 ↑</a>
+        </footer>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

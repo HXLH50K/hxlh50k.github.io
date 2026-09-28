@@ -1,0 +1,74 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostList from './PostList.astro';
+import Pagination from './Pagination.astro';
+import { getTags, tagUrl, type Post } from '../lib/posts';
+import { site } from '../site';
+
+interface Props {
+  posts: Post[];
+  currentPage: number;
+}
+
+const { posts, currentPage } = Astro.props;
+const totalPages = Math.max(1, Math.ceil(posts.length / site.pageSize));
+const visiblePosts = posts.slice((currentPage - 1) * site.pageSize, currentPage * site.pageSize);
+const tags = getTags(posts);
+const popularTags = [...tags].sort((a, b) => b.posts.length - a.posts.length).slice(0, 12);
+---
+
+<BaseLayout
+  title={currentPage > 1 ? `第 ${currentPage} 页` : undefined}
+  canonicalPath={currentPage === 1 ? '/' : `/page/${currentPage}/`}
+>
+  <Fragment slot="head">
+    {currentPage > 1 && <link rel="prev" href={new URL(currentPage === 2 ? '/' : `/page/${currentPage - 1}/`, site.url).href} />}
+    {currentPage < totalPages && <link rel="next" href={new URL(`/page/${currentPage + 1}/`, site.url).href} />}
+  </Fragment>
+  <section class="home-intro" aria-labelledby="home-title">
+    <div>
+      <p class="eyebrow">学习 · 实践 · 记录</p>
+      <h1 id="home-title">{site.title}<span class="title-dot">.</span></h1>
+      <p class="intro-subtitle">{site.subtitle}</p>
+      <p class="intro-description">{site.description}</p>
+    </div>
+    <img class="intro-avatar" src={site.avatar} alt={`${site.author} 的头像`} width="96" height="96" />
+  </section>
+
+  <div class="home-grid">
+    <section aria-labelledby="posts-title" class="home-posts">
+      <div class="section-heading">
+        <h2 id="posts-title">{currentPage === 1 ? '最近文章' : `文章 · 第 ${currentPage} 页`}</h2>
+        <span>共 {posts.length} 篇</span>
+      </div>
+      <PostList posts={visiblePosts} />
+      <Pagination currentPage={currentPage} totalPages={totalPages} />
+    </section>
+    <aside class="home-sidebar" aria-label="博客概览">
+      <section class="sidebar-panel">
+        <p class="eyebrow">关于这里</p>
+        <h2>你好，我是 {site.author}</h2>
+        <p>把折腾过的技术、学到的知识，留在这里，方便日后回看。</p>
+        <div class="blog-stats">
+          <a href="/archives/"><strong>{posts.length}</strong><span>篇文章</span></a>
+          <a href="/tags/"><strong>{tags.length}</strong><span>个标签</span></a>
+        </div>
+        <a class="text-link" href={site.github} rel="me">在 GitHub 上找到我 <span aria-hidden="true">↗</span></a>
+      </section>
+      {popularTags.length > 0 && (
+        <section class="sidebar-panel">
+          <h2>常写的话题</h2>
+          <ul class="tag-list" role="list">
+            {popularTags.map((tag) => <li><a class="tag" href={tagUrl(tag.name)}>{tag.name}</a></li>)}
+          </ul>
+          <a class="text-link" href="/tags/">浏览全部标签 <span aria-hidden="true">→</span></a>
+        </section>
+      )}
+      <section class="sidebar-panel subscribe-panel">
+        <h2>用自己的节奏阅读</h2>
+        <p>通过 RSS 订阅，在你喜欢的阅读器里接收新文章。</p>
+        <a class="text-link" href="/rss.xml">订阅 RSS <span aria-hidden="true">→</span></a>
+      </section>
+    </aside>
+  </div>
+</BaseLayout>

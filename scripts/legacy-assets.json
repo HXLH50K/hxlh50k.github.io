@@ -1,0 +1,74 @@
+[
+  {
+    "source": "src/content/posts/2021-04-05-使用MobaXterm远程连接Linux服务器/images/01.jpg",
+    "destination": "2021/04/05/使用MobaXterm远程连接Linux服务器/01.jpg"
+  },
+  {
+    "source": "src/content/posts/2021-04-05-使用MobaXterm远程连接Linux服务器/images/02.jpg",
+    "destination": "2021/04/05/使用MobaXterm远程连接Linux服务器/02.jpg"
+  },
+  {
+    "source": "src/content/posts/2021-04-05-使用MobaXterm远程连接Linux服务器/images/03.jpg",
+    "destination": "2021/04/05/使用MobaXterm远程连接Linux服务器/03.jpg"
+  },
+  {
+    "source": "src/content/posts/2021-04-05-使用MobaXterm远程连接Linux服务器/images/04.jpg",
+    "destination": "2021/04/05/使用MobaXterm远程连接Linux服务器/04.jpg"
+  },
+  {
+    "source": "src/content/posts/2021-04-05-使用MobaXterm远程连接Linux服务器/images/05.jpg",
+    "destination": "2021/04/05/使用MobaXterm远程连接Linux服务器/05.jpg"
+  },
+  {
+    "source": "src/content/posts/2021-04-05-使用MobaXterm远程连接Linux服务器/images/06.jpg",
+    "destination": "2021/04/05/使用MobaXterm远程连接Linux服务器/06.jpg"
+  },
+  {
+    "source": "src/content/posts/2021-04-05-使用MobaXterm远程连接Linux服务器/images/07.jpg",
+    "destination": "2021/04/05/使用MobaXterm远程连接Linux服务器/07.jpg"
+  },
+  {
+    "source": "src/content/posts/2021-04-05-使用MobaXterm远程连接Linux服务器/images/08.jpg",
+    "destination": "2021/04/05/使用MobaXterm远程连接Linux服务器/08.jpg"
+  },
+  {
+    "source": "src/content/posts/2021-05-16-Word为公式插入域编号及交叉引用/images/01.jpg",
+    "destination": "2021/05/16/Word为公式插入域编号及交叉引用/01.jpg"
+  },
+  {
+    "source": "src/content/posts/2021-05-16-Word为公式插入域编号及交叉引用/images/02.jpg",
+    "destination": "2021/05/16/Word为公式插入域编号及交叉引用/02.jpg"
+  },
+  {
+    "source": "src/content/posts/2021-05-16-Word为公式插入域编号及交叉引用/images/03.jpg",
+    "destination": "2021/05/16/Word为公式插入域编号及交叉引用/03.jpg"
+  },
+  {
+    "source": "src/content/posts/2021-05-16-Word为公式插入域编号及交叉引用/images/04.jpg",
+    "destination": "2021/05/16/Word为公式插入域编号及交叉引用/04.jpg"
+  },
+  {
+    "source": "src/content/posts/2021-05-16-Word为公式插入域编号及交叉引用/images/05.jpg",
+    "destination": "2021/05/16/Word为公式插入域编号及交叉引用/05.jpg"
+  },
+  {
+    "source": "src/content/posts/2021-05-16-Word为公式插入域编号及交叉引用/images/06.jpg",
+    "destination": "2021/05/16/Word为公式插入域编号及交叉引用/06.jpg"
+  },
+  {
+    "source": "src/content/posts/2021-05-16-Word为公式插入域编号及交叉引用/images/07.jpg",
+    "destination": "2021/05/16/Word为公式插入域编号及交叉引用/07.jpg"
+  },
+  {
+    "source": "src/content/posts/2021-05-16-Word为公式插入域编号及交叉引用/images/08.jpg",
+    "destination": "2021/05/16/Word为公式插入域编号及交叉引用/08.jpg"
+  },
+  {
+    "source": "src/content/posts/2021-05-16-Word为公式插入域编号及交叉引用/images/09.jpg",
+    "destination": "2021/05/16/Word为公式插入域编号及交叉引用/09.jpg"
+  },
+  {
+    "source": "src/content/posts/2021-05-16-Word为公式插入域编号及交叉引用/images/10.jpg",
+    "destination": "2021/05/16/Word为公式插入域编号及交叉引用/10.jpg"
+  }
+]

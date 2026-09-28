@@ -1,0 +1,60 @@
+name: Build and deploy Astro
+
+on:
+  push:
+    branches: [source]
+  pull_request:
+    branches: [source]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ASTRO_TELEMETRY_DISABLED: '1'
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Check Astro and TypeScript
+        run: npm run check
+      - name: Test content and writing tools
+        run: npm test
+      - name: Build website
+        run: npm run build
+      - name: Verify generated site and old URLs
+        run: npm run test:site
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/source'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/source'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

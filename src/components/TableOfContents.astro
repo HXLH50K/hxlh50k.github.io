@@ -1,0 +1,25 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const minDepth = Math.min(...headings.map((heading) => heading.depth));
+---
+
+{headings.length > 0 && (
+  <details class="toc" open>
+    <summary>文章目录</summary>
+    <nav aria-label="文章目录">
+      <ol class="toc-list" role="list">
+        {headings.map((heading) => (
+          <li style={`--toc-depth: ${heading.depth - minDepth}`}>
+            <a href={`#${heading.slug}`}>{heading.text}</a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  </details>
+)}

@@ -1,0 +1,17 @@
+---
+import { site } from '../site';
+---
+
+<footer class="site-footer">
+  <div>
+    <a class="footer-title" href="/">{site.title}</a>
+    <span class="footer-divider" aria-hidden="true">/</span>
+    <span>{site.subtitle}</span>
+  </div>
+  <div class="footer-links">
+    <span>© {site.author}</span>
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" rel="license">CC BY-NC-SA 4.0</a>
+    <a href={site.github} rel="me">GitHub</a>
+    <a href="/rss.xml">RSS 订阅</a>
+  </div>
+</footer>

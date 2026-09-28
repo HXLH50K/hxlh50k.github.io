@@ -1,0 +1,35 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  basePath?: string;
+}
+
+const { currentPage, totalPages, basePath = '/' } = Astro.props;
+const pageUrl = (page: number) => page === 1 ? basePath : `${basePath}page/${page}/`;
+const pages = Array.from({ length: totalPages }, (_, index) => index + 1)
+  .filter((page) => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1);
+---
+
+{totalPages > 1 && (
+  <nav class="pagination" aria-label="文章分页">
+    <div class="pagination-direction">
+      {currentPage > 1 && <a href={pageUrl(currentPage - 1)} rel="prev">← 上一页</a>}
+    </div>
+    <ol role="list">
+      {pages.map((page, index) => (
+        <>
+          {index > 0 && page - pages[index - 1]! > 1 && <li class="pagination-gap" aria-hidden="true">…</li>}
+          <li>
+            <a href={pageUrl(page)} aria-label={`第 ${page} 页`} aria-current={page === currentPage ? 'page' : undefined}>
+              {page}
+            </a>
+          </li>
+        </>
+      ))}
+    </ol>
+    <div class="pagination-direction pagination-next">
+      {currentPage < totalPages && <a href={pageUrl(currentPage + 1)} rel="next">下一页 →</a>}
+    </div>
+  </nav>
+)}

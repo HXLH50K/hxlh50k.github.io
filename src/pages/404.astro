@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="页面未找到" canonicalPath="/404.html" noindex>
+  <section class="not-found" aria-labelledby="not-found-title">
+    <p class="error-code" aria-hidden="true">404</p>
+    <p class="eyebrow">走到了一条小岔路</p>
+    <h1 id="not-found-title">没有找到这个页面</h1>
+    <p>链接可能已经失效，或者地址有误。试试回到首页，或在归档中找找那篇文章。</p>
+    <div class="not-found-actions">
+      <a class="button-link" href="/">返回首页</a>
+      <a class="button-link button-secondary" href="/archives/">浏览归档</a>
+    </div>
+  </section>
+</BaseLayout>

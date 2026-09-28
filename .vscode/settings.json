@@ -1,0 +1,6 @@
+{
+  "markdown.copyFiles.destination": {
+    "/src/content/posts/**/*": "images/"
+  },
+  "markdown.validate.enabled": true
+}

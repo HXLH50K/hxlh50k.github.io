@@ -1,0 +1,42 @@
+---
+import { formatDate, postUrl, tagUrl, type Post } from '../lib/posts';
+
+interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+{posts.length === 0 ? (
+  <p class="empty-state">这里还没有文章，稍后再来看看吧。</p>
+) : (
+  <ol class="post-list" role="list">
+    {posts.map((post) => (
+      <li>
+        <article class="post-card">
+          <div class="post-meta">
+            {post.data.draft && <strong>草稿 · </strong>}
+            <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+          </div>
+          <h2><a href={postUrl(post)}>{post.data.title}</a></h2>
+          {(post.data.excerpt || post.data.description) && (
+            <p class="post-summary">{post.data.excerpt || post.data.description}</p>
+          )}
+          <div class="post-card-bottom">
+            {post.data.tags.length > 0 && (
+              <ul class="tag-list" aria-label="文章标签" role="list">
+                {post.data.tags.map((tag) => (
+                  <li><a class="tag" href={tagUrl(tag)}><span aria-hidden="true">#</span> {tag}</a></li>
+                ))}
+              </ul>
+            )}
+            <a class="read-more" href={postUrl(post)} aria-label={`阅读全文：${post.data.title}`}>
+              阅读全文 <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </article>
+      </li>
+    ))}
+  </ol>
+)}

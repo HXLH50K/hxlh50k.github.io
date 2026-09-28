@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPosts, getTags, tagUrl } from '../../lib/posts';
+
+const tags = getTags(await getPosts());
+---
+
+<BaseLayout title="标签" description={`通过 ${tags.length} 个标签，找到感兴趣的技术笔记与学习记录。`}>
+  <div class="collection-page">
+    <header class="page-heading">
+      <p class="eyebrow">从兴趣出发</p>
+      <h1>标签<span class="title-dot">.</span></h1>
+      <p>共 {tags.length} 个标签，选一个话题慢慢读。</p>
+    </header>
+    {tags.length === 0 ? <p class="empty-state">还没有标签。</p> : (
+      <ul class="tag-index" role="list" aria-label="全部标签">
+        {tags.map((tag) => (
+          <li>
+            <a href={tagUrl(tag.name)}>
+              <span class="tag-index-name"><span class="tag-hash" aria-hidden="true">#</span> {tag.name}</span>
+              <span class="tag-count">{tag.posts.length}<span class="sr-only"> 篇文章</span></span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</BaseLayout>

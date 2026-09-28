@@ -1,0 +1,500 @@
+{
+  "/2021/04/13/文献翻译 Informer Beyond Efficient Transformer for Long Sequence/": [
+    {
+      "text": "说明",
+      "id": "说明"
+    },
+    {
+      "text": "摘要",
+      "id": "摘要"
+    },
+    {
+      "text": "1 介绍",
+      "id": "1-介绍"
+    },
+    {
+      "text": "2 准备",
+      "id": "2-准备"
+    },
+    {
+      "text": "3 方法",
+      "id": "3-方法"
+    },
+    {
+      "text": "高效自注意力机制",
+      "id": "高效自注意力机制"
+    },
+    {
+      "text": "编码器:允许在内存使用限制下处理较长的顺序输入",
+      "id": "编码器-允许在内存使用限制下处理较长的顺序输入"
+    },
+    {
+      "text": "解码器：通过一次前向传播生成长顺序输出",
+      "id": "解码器：通过一次前向传播生成长顺序输出"
+    },
+    {
+      "text": "后面实验、结论、附录懒得翻译了自己看原文吧",
+      "id": "后面实验、结论、附录懒得翻译了自己看原文吧"
+    }
+  ],
+  "/2021/05/16/Word为公式插入域编号及交叉引用/": [
+    {
+      "text": "Part1 为公式插入域编号",
+      "id": "Part1-为公式插入域编号"
+    },
+    {
+      "text": "Part2 交叉引用公式",
+      "id": "Part2-交叉引用公式"
+    }
+  ],
+  "/2021/08/25/深度学习基础知识点/": [
+    {
+      "text": "优化算法",
+      "id": "优化算法"
+    },
+    {
+      "text": "GD",
+      "id": "GD"
+    },
+    {
+      "text": "BGD 批量梯度下降法",
+      "id": "BGD-批量梯度下降法"
+    },
+    {
+      "text": "SGD 随机梯度下降法",
+      "id": "SGD-随机梯度下降法"
+    },
+    {
+      "text": "MBGD 小批量梯度下降",
+      "id": "MBGD-小批量梯度下降"
+    },
+    {
+      "text": "动量优化算法",
+      "id": "动量优化算法"
+    },
+    {
+      "text": "牛顿动量（Nesterov）算法",
+      "id": "牛顿动量（Nesterov）算法"
+    },
+    {
+      "text": "自适应学习率优化算法",
+      "id": "自适应学习率优化算法"
+    },
+    {
+      "text": "Adagrad",
+      "id": "Adagrad"
+    },
+    {
+      "text": "RMSProp",
+      "id": "RMSProp"
+    },
+    {
+      "text": "AdaDelta",
+      "id": "AdaDelta"
+    },
+    {
+      "text": "Adam",
+      "id": "Adam"
+    },
+    {
+      "text": "batch-size 如何设置",
+      "id": "batch-size-如何设置"
+    },
+    {
+      "text": "正则化：",
+      "id": "正则化："
+    },
+    {
+      "text": "常见损失函数",
+      "id": "常见损失函数"
+    },
+    {
+      "text": "BCE",
+      "id": "BCE"
+    },
+    {
+      "text": "CE",
+      "id": "CE"
+    },
+    {
+      "text": "MAE/L1",
+      "id": "MAE-L1"
+    },
+    {
+      "text": "Smooth L1",
+      "id": "Smooth-L1"
+    },
+    {
+      "text": "MSE/L2",
+      "id": "MSE-L2"
+    },
+    {
+      "text": "FOCAL",
+      "id": "FOCAL"
+    },
+    {
+      "text": "DICE",
+      "id": "DICE"
+    },
+    {
+      "text": "IOU",
+      "id": "IOU"
+    },
+    {
+      "text": "激活函数",
+      "id": "激活函数"
+    },
+    {
+      "text": "sigmoid",
+      "id": "sigmoid"
+    },
+    {
+      "text": "hard sigmoid",
+      "id": "hard-sigmoid"
+    },
+    {
+      "text": "softmax",
+      "id": "softmax"
+    },
+    {
+      "text": "tanh",
+      "id": "tanh"
+    },
+    {
+      "text": "ReLU",
+      "id": "ReLU"
+    },
+    {
+      "text": "ReLU6",
+      "id": "ReLU6"
+    },
+    {
+      "text": "Leaky ReLU",
+      "id": "Leaky-ReLU"
+    },
+    {
+      "text": "PReLU",
+      "id": "PReLU"
+    },
+    {
+      "text": "RReLU",
+      "id": "RReLU"
+    },
+    {
+      "text": "ELU",
+      "id": "ELU"
+    },
+    {
+      "text": "GeLU (for bert)",
+      "id": "GeLU-for-bert"
+    },
+    {
+      "text": "Maxout：",
+      "id": "Maxout："
+    },
+    {
+      "text": "Swish",
+      "id": "Swish"
+    },
+    {
+      "text": "H-Swish",
+      "id": "H-Swish"
+    },
+    {
+      "text": "评价指标",
+      "id": "评价指标"
+    },
+    {
+      "text": "分类",
+      "id": "分类"
+    },
+    {
+      "text": "准确率",
+      "id": "准确率"
+    },
+    {
+      "text": "精确率",
+      "id": "精确率"
+    },
+    {
+      "text": "召回率",
+      "id": "召回率"
+    },
+    {
+      "text": "F-score",
+      "id": "F-score"
+    },
+    {
+      "text": "AUC/GAUC https://zhuanlan.zhihu.com/p/84350940",
+      "id": "AUC-GAUC-https-zhuanlan-zhihu-com-p-84350940"
+    },
+    {
+      "text": "ROC",
+      "id": "ROC"
+    },
+    {
+      "text": "AUC",
+      "id": "AUC"
+    },
+    {
+      "text": "GAUC",
+      "id": "GAUC"
+    },
+    {
+      "text": "Normalization 层",
+      "id": "Normalization-层"
+    },
+    {
+      "text": "Normlization 层的作用",
+      "id": "Normlization-层的作用"
+    },
+    {
+      "text": "BN、IN、GN、LN 区别",
+      "id": "BN、IN、GN、LN-区别"
+    },
+    {
+      "text": "BN 计算",
+      "id": "BN-计算"
+    },
+    {
+      "text": "优点：",
+      "id": "优点："
+    },
+    {
+      "text": "缺点：",
+      "id": "缺点："
+    }
+  ],
+  "/2021/08/25/机器学习知识点/": [
+    {
+      "text": "Logistic Regression",
+      "id": "Logistic-Regression"
+    },
+    {
+      "text": "简介",
+      "id": "简介"
+    },
+    {
+      "text": "目的",
+      "id": "目的"
+    },
+    {
+      "text": "优点：",
+      "id": "优点："
+    },
+    {
+      "text": "缺点：",
+      "id": "缺点："
+    },
+    {
+      "text": "SVM",
+      "id": "SVM"
+    },
+    {
+      "text": "基础",
+      "id": "基础"
+    },
+    {
+      "text": "Loss 函数",
+      "id": "Loss-函数"
+    },
+    {
+      "text": "间隔最大化",
+      "id": "间隔最大化"
+    },
+    {
+      "text": "对偶问题",
+      "id": "对偶问题"
+    },
+    {
+      "text": "核函数",
+      "id": "核函数"
+    },
+    {
+      "text": "核函数公式",
+      "id": "核函数公式"
+    },
+    {
+      "text": "为什么 SVM 对缺失数据敏感",
+      "id": "为什么-SVM-对缺失数据敏感"
+    },
+    {
+      "text": "核函数之间的区别",
+      "id": "核函数之间的区别"
+    }
+  ],
+  "/2021/08/27/JS学习笔记：手写call, apply, bind/": [
+    {
+      "text": "call",
+      "id": "call"
+    },
+    {
+      "text": "apply",
+      "id": "apply"
+    },
+    {
+      "text": "bind",
+      "id": "bind"
+    }
+  ],
+  "/2025/12/28/Setup-Hysteria2-Proxy-with-Self-Signed-Certificate-on-Ubuntu/": [
+    {
+      "text": "1. Prerequisites and Conventions",
+      "id": "1-Prerequisites-and-Conventions"
+    },
+    {
+      "text": "Existing Installations: Read This First",
+      "id": "Existing-Installations-Read-This-First"
+    },
+    {
+      "text": "2. Install the Official Service",
+      "id": "2-Install-the-Official-Service"
+    },
+    {
+      "text": "3. Create a Self-Signed Certificate",
+      "id": "3-Create-a-Self-Signed-Certificate"
+    },
+    {
+      "text": "4. Write the Server Configuration",
+      "id": "4-Write-the-Server-Configuration"
+    },
+    {
+      "text": "5. Allow UDP and Preserve Management Access",
+      "id": "5-Allow-UDP-and-Preserve-Management-Access"
+    },
+    {
+      "text": "Azure Network Security Group",
+      "id": "Azure-Network-Security-Group"
+    },
+    {
+      "text": "Ubuntu Firewall",
+      "id": "Ubuntu-Firewall"
+    },
+    {
+      "text": "6. Start and Verify the Service",
+      "id": "6-Start-and-Verify-the-Service"
+    },
+    {
+      "text": "7. Connect and Test from the Client",
+      "id": "7-Connect-and-Test-from-the-Client"
+    },
+    {
+      "text": "8. Diagnose Intermittent Disconnections",
+      "id": "8-Diagnose-Intermittent-Disconnections"
+    },
+    {
+      "text": "Port Hopping Is an Optional Experiment, Not a Default Fix",
+      "id": "Port-Hopping-Is-an-Optional-Experiment-Not-a-Default-Fix"
+    },
+    {
+      "text": "9. Maintenance and Next Steps",
+      "id": "9-Maintenance-and-Next-Steps"
+    },
+    {
+      "text": "References",
+      "id": "References"
+    }
+  ],
+  "/2023/06/05/基于Cosmic搭建Global Maplestory v083私服/": [
+    {
+      "text": "准备工作",
+      "id": "准备工作"
+    },
+    {
+      "text": "1. 整个服务器",
+      "id": "1-整个服务器"
+    },
+    {
+      "text": "2. 配置Windows防火墙规则",
+      "id": "2-配置Windows防火墙规则"
+    },
+    {
+      "text": "3. 配置服务器防火墙规则",
+      "id": "3-配置服务器防火墙规则"
+    },
+    {
+      "text": "服务器端",
+      "id": "服务器端"
+    },
+    {
+      "text": "客户端",
+      "id": "客户端"
+    },
+    {
+      "text": "参考资料",
+      "id": "参考资料"
+    }
+  ],
+  "/2025/12/29/Managing-Nodes-with-Gist-Subscription/": [
+    {
+      "text": "Step 1: Get Your Node Links",
+      "id": "Step-1-Get-Your-Node-Links"
+    },
+    {
+      "text": "Step 2: Create a Secret Gist",
+      "id": "Step-2-Create-a-Secret-Gist"
+    },
+    {
+      "text": "Step 3: Use the Raw Link as a Subscription",
+      "id": "Step-3-Use-the-Raw-Link-as-a-Subscription"
+    }
+  ],
+  "/2025/12/29/Configure-Public-Certificate-for-Multiple-Servers/": [
+    {
+      "text": "1. Prerequisites",
+      "id": "1-Prerequisites"
+    },
+    {
+      "text": "2. Prepare the DNS Record and VM Identity",
+      "id": "2-Prepare-the-DNS-Record-and-VM-Identity"
+    },
+    {
+      "text": "2.1 Select Resources in Azure Cloud Shell",
+      "id": "2-1-Select-Resources-in-Azure-Cloud-Shell"
+    },
+    {
+      "text": "2.2 Create the Server’s A Record",
+      "id": "2-2-Create-the-Server’s-A-Record"
+    },
+    {
+      "text": "2.3 Preferred: Use the Azure VM’s System-Assigned Managed Identity",
+      "id": "2-3-Preferred-Use-the-Azure-VM’s-System-Assigned-Managed-Identity"
+    },
+    {
+      "text": "2.4 Alternative: A Service Principal for Non-Azure Servers",
+      "id": "2-4-Alternative-A-Service-Principal-for-Non-Azure-Servers"
+    },
+    {
+      "text": "3. Install acme.sh and Request the Certificate",
+      "id": "3-Install-acme-sh-and-Request-the-Certificate"
+    },
+    {
+      "text": "4. Install the Certificate with Service-Readable Permissions",
+      "id": "4-Install-the-Certificate-with-Service-Readable-Permissions"
+    },
+    {
+      "text": "Switch Hysteria to the New Paths",
+      "id": "Switch-Hysteria-to-the-New-Paths"
+    },
+    {
+      "text": "5. Update and Verify the Client",
+      "id": "5-Update-and-Verify-the-Client"
+    },
+    {
+      "text": "6. Check Renewal and Keep Logs",
+      "id": "6-Check-Renewal-and-Keep-Logs"
+    },
+    {
+      "text": "Migrating an Existing Wildcard Renewal",
+      "id": "Migrating-an-Existing-Wildcard-Renewal"
+    },
+    {
+      "text": "7. Add Another Server",
+      "id": "7-Add-Another-Server"
+    },
+    {
+      "text": "References",
+      "id": "References"
+    }
+  ]
+}
