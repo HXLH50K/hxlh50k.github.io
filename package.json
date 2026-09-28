@@ -29,7 +29,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "cheerio": "^1.1.2",
-    "typescript": "~5.9.3",
+    "typescript": "~7.0.2",
     "yaml": "^2.8.1"
   }
 }
