@@ -27,7 +27,7 @@
     "remark-math": "^6.0.0"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.10",
+    "@astrojs/check": "^0.9.11",
     "cheerio": "^1.1.2",
     "typescript": "~5.9.3",
     "yaml": "^2.8.1"
